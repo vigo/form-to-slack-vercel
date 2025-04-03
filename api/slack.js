@@ -24,7 +24,12 @@ export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-    const { text } = req.body;
+    const { text, website } = req.body;
+    
+    if (website) {
+        return res.status(400).json({ error: 'Spam detected' });
+    }
+
     if (!text) return res.status(400).json({ error: 'Missing text' });
     
     const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress;
