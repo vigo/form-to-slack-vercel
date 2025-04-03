@@ -1,4 +1,4 @@
-const VERSION = '0.0.0';
+const VERSION = '0.0.1';
 
 const ALLOWED_ORIGINS = [
     'https://bilusteknoloji.com',
