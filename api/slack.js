@@ -1,11 +1,11 @@
-const VERSION = '0.0.1';
+const VERSION = '0.0.2';
 
 const ALLOWED_ORIGINS = [
     'https://bilusteknoloji.com',
     'http://localhost:3000',
-    'http://127.0.0.1:3000',
+    'http://127.0.0.2:3000',
     'http://localhost:4567',
-    'http://127.0.0.1:4567'
+    'http://127.0.0.2:4567'
 ];
 
 export default async function handler(req, res) {
