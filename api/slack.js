@@ -1,3 +1,5 @@
+const VERSION = '0.0.0';
+
 const ALLOWED_ORIGINS = [
     'https://bilusteknoloji.com',
     'http://localhost:3000',
@@ -24,11 +26,14 @@ export default async function handler(req, res) {
 
     const { text } = req.body;
     if (!text) return res.status(400).json({ error: 'Missing text' });
-
+    
+    const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress;
+    const message = `${text}IP:\`\`\`${ip}\`\`\`\nVersion:\`\`\`${VERSION}\`\`\``;
+    
     const response = await fetch(process.env.SLACK_WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text })
+        body: JSON.stringify({ text: message })
     });
 
     if (!response.ok) {
