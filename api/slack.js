@@ -51,8 +51,6 @@ async function validateToken(token) {
 }
 
 export default async function handler(req, res) {
-    const csrf_token = req.body.csrf_token || '';
-    
     const origin = req.headers.origin;
 
     if (ALLOWED_ORIGINS.includes(origin)) {
@@ -62,6 +60,14 @@ export default async function handler(req, res) {
         return res.status(403).json({ error: 'Forbidden' });
     }
 
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') return res.status(200).end();
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+    const { text, website, csrf_token } = req.body;
+
     if (!csrf_token) {
         return res.status(400).json({ error: 'Missing CSRF token' });
     }
@@ -69,14 +75,6 @@ export default async function handler(req, res) {
     if (!await validateToken(csrf_token)) {
         return res.status(403).json({ error: 'CSRF Token expired' });
     }
-    
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-    if (req.method === 'OPTIONS') return res.status(200).end();
-    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-
-    const { text, website } = req.body;
     
     if (website) {
         return res.status(400).json({ error: 'Spam detected' });
