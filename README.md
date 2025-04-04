@@ -1,4 +1,4 @@
-![Version](https://img.shields.io/badge/version-0.0.4-orange.svg?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-0.0.5-orange.svg?style=for-the-badge)
 
 # Form To Slack
 
