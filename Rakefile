@@ -36,7 +36,7 @@ task :default => ['run:server']
 namespace :run do
   desc 'run server'
   task :server do
-    system %{ vercel dev }
+    system %{ VERCEL_ENV=development vercel dev }
     exit($CHILD_STATUS&.exitstatus || 1)
   rescue Interrupt
     exit(130)

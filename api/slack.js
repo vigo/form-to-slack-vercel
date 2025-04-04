@@ -3,9 +3,11 @@ const VERSION = '0.0.2';
 const ALLOWED_ORIGINS = [
     'https://bilusteknoloji.com',
     'http://localhost:3000',
-    'http://127.0.0.2:3000',
     'http://localhost:4567',
-    'http://127.0.0.2:4567'
+    'http://localhost:9001',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:4567',
+    'http://127.0.0.1:9001',
 ];
 
 export default async function handler(req, res) {
@@ -34,7 +36,15 @@ export default async function handler(req, res) {
     
     const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress;
     const message = `${text}IP:\`\`\`${ip}\`\`\`\nVersion:\`\`\`${VERSION}\`\`\``;
-    
+
+    if (process.env.VERCEL_ENV == 'development') {
+        console.log('debug mode, will not post to slack');
+        console.log('ip', ip);
+        console.log('message', message);
+
+        return res.status(200).json({ success: true });
+    }
+
     const response = await fetch(process.env.SLACK_WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
