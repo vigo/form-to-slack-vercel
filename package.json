@@ -1,0 +1,9 @@
+{
+    "name": "form-to-slack-vercel",
+    "version": "0.0.3",
+    "author": "vigo",
+    "type": "module",
+    "dependencies": {
+        "@upstash/redis": "^1.34.6"
+    }
+}

@@ -26,3 +26,7 @@ filename = "README.md"
 [[tool.bumpversion.files]]
 filename = "api/slack.js"
 
+[[tool.bumpversion.files]]
+filename = "package.json"
+
+

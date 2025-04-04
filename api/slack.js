@@ -1,4 +1,13 @@
+import { Redis } from '@upstash/redis';
+
+const redis = new Redis({
+    url: process.env.UPSTASH_REDIS_REST_URL,
+    token: process.env.UPSTASH_REDIS_SECRET
+});
+
 const VERSION = '0.0.3';
+const CACHE_EXPIRE = 3 * 60;
+const MAX_AGE = CACHE_EXPIRE * 1000;
 
 const ALLOWED_ORIGINS = [
     'https://bilusteknoloji.com',
@@ -10,12 +19,55 @@ const ALLOWED_ORIGINS = [
     'http://127.0.0.1:9001',
 ];
 
+function log(...args) {
+    if (process.env.VERCEL_ENV === 'development') {
+        console.log('[log]', ...args);
+    }
+}
+
+
+async function validateToken(token) {
+    if (!token) return false;
+
+    const nowGuess = Date.now().toString(36);
+    const tsLen = nowGuess.length;
+
+    const tsPart = token.substring(0, tsLen);
+    const ts = parseInt(tsPart, 36);
+
+    if (isNaN(ts)) return false;
+
+    const age = Date.now() - ts;
+    log('age', age, 'MAX_AGE', MAX_AGE);
+    if (age < 0 || age > MAX_AGE) return false;
+
+    const wasUsed = await redis.get(`csrf:${token}`);
+    log('wasUsed', wasUsed);
+    
+    if (wasUsed) return false;
+    await redis.set(`csrf:${token}`, '1', { ex: CACHE_EXPIRE });
+    
+    return true
+}
+
 export default async function handler(req, res) {
+    const csrf_token = req.body.csrf_token || '';
+    
+    if (!csrf_token) {
+        return res.status(400).json({ error: 'Missing CSRF token' });
+    }
+    
+    if (!await validateToken(csrf_token)) {
+        return res.status(403).json({ error: 'CSRF Token expired' });
+    }
+    
     const origin = req.headers.origin;
 
     if (ALLOWED_ORIGINS.includes(origin)) {
         res.setHeader('Access-Control-Allow-Origin', origin);
         res.setHeader('Vary', 'Origin');
+        res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     } else {
         return res.status(403).json({ error: 'Forbidden' });
     }
@@ -38,9 +90,10 @@ export default async function handler(req, res) {
     const message = `${text}IP:\`\`\`${ip}\`\`\`\nVersion:\`\`\`${VERSION}\`\`\``;
 
     if (process.env.VERCEL_ENV == 'development') {
-        console.log('debug mode, will not post to slack');
-        console.log('ip', ip);
-        console.log('message', message);
+        log('debug mode, will not post to slack');
+        log('ip', ip);
+        log('message', message);
+        log('csrf_token', csrf_token);
 
         return res.status(200).json({ success: true });
     }
