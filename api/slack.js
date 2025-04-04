@@ -53,6 +53,15 @@ async function validateToken(token) {
 export default async function handler(req, res) {
     const csrf_token = req.body.csrf_token || '';
     
+    const origin = req.headers.origin;
+
+    if (ALLOWED_ORIGINS.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Vary', 'Origin');
+    } else {
+        return res.status(403).json({ error: 'Forbidden' });
+    }
+
     if (!csrf_token) {
         return res.status(400).json({ error: 'Missing CSRF token' });
     }
@@ -61,17 +70,6 @@ export default async function handler(req, res) {
         return res.status(403).json({ error: 'CSRF Token expired' });
     }
     
-    const origin = req.headers.origin;
-
-    if (ALLOWED_ORIGINS.includes(origin)) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-        res.setHeader('Vary', 'Origin');
-        res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    } else {
-        return res.status(403).json({ error: 'Forbidden' });
-    }
-
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
