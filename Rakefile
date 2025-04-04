@@ -18,7 +18,7 @@ end
 AVAILABLE_REVISIONS = %w[major minor patch].freeze
 
 desc "bump version, default: patch, available: #{AVAILABLE_REVISIONS.join(',')}"
-task :bump, [:revision] => [:has_bump_my_version] do |_, args|
+task :release, [:revision] => [:has_bump_my_version] do |_, args|
   args.with_defaults(revision: 'patch')
 
   unless AVAILABLE_REVISIONS.include?(args.revision)

@@ -1,3 +1,4 @@
+import { VERSION } from '../lib/version.js';
 import { Redis } from '@upstash/redis';
 
 const redis = new Redis({
@@ -5,7 +6,6 @@ const redis = new Redis({
     token: process.env.UPSTASH_REDIS_SECRET
 });
 
-const VERSION = '0.0.3';
 const CACHE_EXPIRE = 3 * 60;
 const MAX_AGE = CACHE_EXPIRE * 1000;
 
@@ -91,6 +91,7 @@ export default async function handler(req, res) {
 
     if (process.env.VERCEL_ENV == 'development') {
         log('debug mode, will not post to slack');
+        log('VERSION', VERSION);
         log('ip', ip);
         log('message', message);
         log('csrf_token', csrf_token);

@@ -24,7 +24,7 @@ post_commit_hooks = []
 filename = "README.md"
 
 [[tool.bumpversion.files]]
-filename = "api/slack.js"
+filename = "lib/version.js"
 
 [[tool.bumpversion.files]]
 filename = "package.json"

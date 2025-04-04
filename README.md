@@ -24,6 +24,7 @@ vercel login
 Run locally:
 
 ```bash
+npm install
 vercel dev
 ```
 
@@ -36,6 +37,14 @@ To deploy production; just `push` the code!
 ```bash
 rake -T
 
-rake bump[revision]  # bump version, default: patch, available: major,minor,patch
-rake run:server      # run server
+rake release[revision]  # bump version, default: patch, available: major,minor,patch
+rake run:server         # run server
 ```
+
+---
+
+## API Endpoints
+
+- http://localhost:3000/api/slack
+- http://localhost:3000/api/health
+
